@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Niraj Voice Bot</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    
+    <header>
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" class="logo"/>
+      <h2>Niraj Voice Bot</h2>
+    </header>
+
+    <div id="chat" class="chat-box"></div>
+
+    <div id="status" class="status">Idle</div>
+
+    <div class="controls">
+      <button id="micBtn">🎤 Hold to Talk</button>
+      <button id="stopBtn">⛔ Stop</button>
+      <button id="newBtn">🔄 New Chat</button>
+    </div>
+
+  </main>
+
+  <script>
+    const micBtn = document.getElementById("micBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const newBtn = document.getElementById("newBtn");
+    const statusEl = document.getElementById("status");
+    const chatBox = document.getElementById("chat");
+
+    let recognition;
+
+    // ✅ Speech Recognition
+    if ("webkitSpeechRecognition" in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = event => {
+        const text = event.results[0][0].transcript;
+        addBubble(text, "user");
+        sendToBot(text);
+      };
+
+      recognition.onerror = () => {
+        statusEl.textContent = "Speech Error";
+      };
+    } else {
+      alert("SpeechRecognition not supported. Use Chrome.");
+    }
+
+    // ✅ Add messages to UI
+    function addBubble(text, role) {
+      const div = document.createElement("div");
+      div.className = `bubble ${role}`;
+      div.innerHTML = `<span>${text}</span>`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // ✅ Send text → server
+    function sendToBot(text) {
+      statusEl.innerHTML = "Thinking... ⏳";
+
+      fetch("/reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: text })
+      })
+      .then(r => r.json())
+      .then(data => {
+        addBubble(data.answer, "bot");
+        speechSynthesis.speak(new SpeechSynthesisUtterance(data.answer));
+        statusEl.innerHTML = "Idle ✅";
+      })
+      .catch(() => {
+        statusEl.innerHTML = "Reply failed ❌";
+      });
+    }
+
+    // ✅ Mic buttons
+    micBtn.onmousedown = () => {
+      if (!recognition) return;
+      speechSynthesis.cancel();
+      statusEl.innerHTML = "Listening... 🎙️";
+      recognition.start();
+    };
+
+    micBtn.onmouseup = () => {
+      if (!recognition) return;
+      statusEl.innerHTML = "Processing... 🔄";
+      recognition.stop();
+    };
+
+    // ✅ Stop speech
+    stopBtn.onclick = () => {
+      speechSynthesis.cancel();
+      statusEl.innerHTML = "Stopped ⛔";
+    };
+
+    // ✅ Clear chat
+    newBtn.onclick = () => {
+      speechSynthesis.cancel();
+      chatBox.innerHTML = "";
+      statusEl.innerHTML = "New chat started ✅";
+    };
+  </script>
+
+</body>
+</html>

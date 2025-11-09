@@ -1,0 +1,103 @@
+body {
+  background: #0e141b;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  color: white;
+}
+
+.container {
+  width: 95%;
+  max-width: 450px;
+  background: #111c26;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 20px #00000070;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.logo {
+  width: 35px;
+}
+
+.chat-box {
+  background: #0b1117;
+  height: 330px;
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.user {
+  background: #1f2a36;
+  align-self: flex-end;
+  text-align: right;
+  margin-left: auto;
+}
+
+.bot {
+  background: #2a3341;
+  align-self: flex-start;
+}
+
+.status {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #9cc9ff;
+}
+
+.controls {
+  display: flex;
+  gap: 6px;
+}
+
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #3e63dd;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #547dff;
+}
+
+#stopBtn {
+  background: #c53a3a;
+}
+
+#stopBtn:hover {
+  background: #ff5050;
+}
+
+#newBtn {
+  background: #2ea44f;
+}
+
+#newBtn:hover {
+  background: #3ecf65;
+}
