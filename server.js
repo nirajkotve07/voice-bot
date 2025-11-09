@@ -82,9 +82,13 @@ User: ${prompt}
   }
 });
 
-// ✅ Only runs locally, ignored on Vercel
-app.listen(3000, () =>
-  console.log("✅ Local server running at http://localhost:3000")
-);
+if (process.env.VERCEL) {
+  // Running on Vercel – do NOT listen on a custom port
+} else {
+  // Running locally
+  app.listen(3000, () => {
+    console.log("✅ Local server running at http://localhost:3000");
+  });
+}
 
 export default app;
