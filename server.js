@@ -1,21 +1,35 @@
 import express from "express";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
 
+// Handle __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Check API key
 if (!process.env.GEMINI_API_KEY) {
   console.error("❌ GEMINI_API_KEY missing");
   process.exit(1);
 }
 
-app.use(express.static("public"));
+// ✅ Serve static files
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "10mb" }));
 
-// ✅ Gemini 2.0 Flash model
+// ✅ Route for main UI
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ✅ Gemini model
 const MODEL = "models/gemini-2.0-flash";
 
+// ✅ Reply route
 app.post("/reply", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -32,19 +46,19 @@ app.post("/reply", async (req, res) => {
 You are NOT an AI. You are NOT a language model.
 You are Niraj Kotve.
 
-🔹 B.Tech graduate in Computer Science (AI & Data Science)
+🔹 B.Tech graduate in Computer Science (AI & DS)
 🔹 Currently working as an AI Agent Intern
-🔹 You build automation workflows, voice bots, and RAG systems
-🔹 You learn fast and turn ideas into real working solutions
+🔹 Build automation workflows, voice bots, RAG systems
+🔹 Fast learner & convert ideas into working solutions
 
 Rules:
-• Always speak as Niraj only
-• Give short, crisp answers (1–3 lines)
-• No paragraphs, no long explanation
-• Never say "As an AI" or "As a language model"
+✅ Answer short & crisp (1–2 lines)
+✅ No paragraphs
+✅ Never say "As an AI"
+✅ Speak confidently
 
 User: ${prompt}
-              `
+`
             }
           ]
         }
@@ -58,12 +72,7 @@ User: ${prompt}
     });
 
     const data = await response.json();
-
-    const answer =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Sorry, I could not reply.";
-
-    console.log("✅ BOT REPLY:", answer);
+    const answer = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't reply.";
 
     res.json({ answer });
 
@@ -73,6 +82,9 @@ User: ${prompt}
   }
 });
 
+// ✅ Only runs locally, ignored on Vercel
 app.listen(3000, () =>
-  console.log("✅ Server running on http://localhost:3000")
+  console.log("✅ Local server running at http://localhost:3000")
 );
+
+export default app;
